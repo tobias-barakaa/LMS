@@ -8,10 +8,10 @@ cryptography==41.0.7
 dj-database-url==2.1.0
 Django==4.2.7
 django-anymail==10.2
+django-ckeditor-5==0.2.12
 django-cors-headers==3.14.0
 django-jazzmin==2.6.0
 django-storages==1.12.3
-django-ckeditor-5
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.2.2
 drf-yasg==1.21.7
@@ -22,6 +22,7 @@ inflection==0.5.1
 jmespath==0.10.0
 marshmallow==3.20.1
 packaging==23.2
+pillow==10.3.0
 psycopg2==2.9.9
 pycparser==2.21
 PyJWT==2.6.0
