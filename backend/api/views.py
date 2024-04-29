@@ -1,11 +1,12 @@
 from django.shortcuts import render
 from api.serializer import MyTokenObtainPairSerializer, RegisterSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework import generics
+from rest_framework import generics, status
 from userauths.models import User, Profile
 from rest_framework.permissions import AllowAny
 from api.serializer import UserSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.response import Response
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
@@ -50,25 +51,37 @@ class PasswordChangeAPIView(generics.CreateAPIView):
     serializer_class = UserSerializer
     
     def create(self, request, *args, **kwargs):
-        data = request.data
-        otp = data.get('otp')
-        uuidb64 = data.get('uuidb64')
-        refresh_token = data.get('refresh_token')
-        password = data.get('password')
-        password2 = data.get('password2')
+        payload = request.data
+        otp = payload['otp']
+        uuidb64 = payload['uuidb64']
+        password = payload['password']
         
-        try:
-            user = User.objects.get(pk=uuidb64)
-            if user.otp == otp and user.refresh_token == refresh_token:
-                if password == password2:
-                    user.set_password(password)
-                    user.save()
-                    return user
-                else:
-                    return {'error': 'Password did not match'}
-            else:
-                return {'error': 'Invalid OTP or Refresh Token'}
-        except User.DoesNotExist:
-            return {'error': 'User does not exist'}
+        user = User.objects.get(pk=uuidb64, otp=otp)
+        if user:
+            user.set_password(password)
+            user.otp = ""
+            user.save()
+            return Response({'message': 'Password changed successfully'}, status=status.HTTP_200_OK)
         
-        return super().create(request, *args, **kwargs)
+        # data = request.data
+        # otp = data.get('otp')
+        # uuidb64 = data.get('uuidb64')
+        # refresh_token = data.get('refresh_token')
+        # password = data.get('password')
+        # password2 = data.get('password2')
+        
+        # try:
+        #     user = User.objects.get(pk=uuidb64)
+        #     if user.otp == otp and user.refresh_token == refresh_token:
+        #         if password == password2:
+        #             user.set_password(password)
+        #             user.save()
+        #             return user
+        #         else:
+        #             return {'error': 'Password did not match'}
+        #     else:
+        #         return {'error': 'Invalid OTP or Refresh Token'}
+        # except User.DoesNotExist:
+        #     return {'error': 'User does not exist'}
+        
+        # return super().create(request, *args, **kwargs)
